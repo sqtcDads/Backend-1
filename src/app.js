@@ -3,19 +3,17 @@ import CartManager from "./CartManager.js";
 import ProductManager from "./ProductManager.js";
 
 const app = express();
-const cartManager = new CartManager();
-const productManager = new ProductManager();
 
 app.use(express.json());
 
 //! Rutas de products
 app.get("/api/products", async (req, res) => {
-    const products = await productManager.getProducts();
+    const products = await ProductManager.getProducts();
     res.json(products);
 });
 
 app.get("/api/products/:pid", async (req, res) => {
-    const product = await productManager.getProductById(parseInt(req.params.pid));
+    const product = await ProductManager.getProductById(parseInt(req.params.pid));
     if (product) {
         res.json(product);
     } else {
@@ -24,12 +22,12 @@ app.get("/api/products/:pid", async (req, res) => {
 });
 
 app.post("/api/products", async (req, res) => {
-    const newProduct = await productManager.addProduct(req.body);
+    const newProduct = await ProductManager.addProduct(req.body);
     res.status(201).json({ product: newProduct, message: "producto creado" });
 });
 
 app.put("/api/products/:pid", async (req, res) => {
-    const updatedProduct = await productManager.updateProductById(parseInt(req.params.pid), req.body);
+    const updatedProduct = await ProductManager.updateProductById(parseInt(req.params.pid), req.body);
     if (updatedProduct) {
         res.json({ product: updatedProduct, message: "producto actualizado" });
     } else {
@@ -38,18 +36,18 @@ app.put("/api/products/:pid", async (req, res) => {
 });
 
 app.delete("/api/products/:pid", async (req, res) => {
-    const remainingProducts = await productManager.deleteProductById(parseInt(req.params.pid));
+    const remainingProducts = await ProductManager.deleteProductById(parseInt(req.params.pid));
     res.json({ products: remainingProducts, message: "producto eliminado" });
 });
 
 //! Rutas de carts
 app.post("/api/carts", async (req, res) => {
-    const newCart = await cartManager.createCart();
+    const newCart = await CartManager.createCart();
     res.status(201).json({ cart: newCart, message: "carrito creado" });
 });
 
 app.get("/api/carts/:cid", async (req, res) => {
-    const cart = await cartManager.getCartById(parseInt(req.params.cid));
+    const cart = await CartManager.getCartById(parseInt(req.params.cid));
     if (cart) {
         res.json(cart);
     } else {
@@ -60,11 +58,11 @@ app.get("/api/carts/:cid", async (req, res) => {
 app.post("/api/carts/:cid/product/:pid", async (req, res) => {
     const cartId = parseInt(req.params.cid);
     const productId = parseInt(req.params.pid);
-    const product = await productManager.getProductById(productId);
+    const product = await ProductManager.getProductById(productId);
     if (!product) {
         return res.status(404).send("Producto no encontrado");
     }
-    const updatedCart = await cartManager.addProductToCart(cartId, productId);
+    const updatedCart = await CartManager.addProductToCart(cartId, productId);
     if (updatedCart) {
         res.json({ cart: updatedCart, message: "producto añadido al carrito" });
     } else {
