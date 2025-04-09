@@ -1,5 +1,4 @@
 import fs from 'fs';
-import CartManager from './CartManager.js';
 
 
 class UserManager {
@@ -29,3 +28,5 @@ class UserManager {
 
 
 }
+
+export default new UserManager();

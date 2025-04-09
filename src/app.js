@@ -1,44 +1,18 @@
 import express from "express";
-import CartManager from "./CartManager.js";
-import ProductManager from "./ProductManager.js";
+import CartManager from "./services/Cart.js";
+import ProductService from "./services/Product.js";
+import UserManager from "./services/User.js"
 
 const app = express();
 
 app.use(express.json());
 
 //! Rutas de products
-app.get("/api/products", async (req, res) => {
-    const products = await ProductManager.getProducts();
-    res.json(products);
-});
-
-app.get("/api/products/:pid", async (req, res) => {
-    const product = await ProductManager.getProductById(parseInt(req.params.pid));
-    if (product) {
-        res.json(product);
-    } else {
-        res.status(404).send("Producto no encontrado");
-    }
-});
-
-app.post("/api/products", async (req, res) => {
-    const newProduct = await ProductManager.addProduct(req.body);
-    res.status(201).json({ product: newProduct, message: "producto creado" });
-});
-
-app.put("/api/products/:pid", async (req, res) => {
-    const updatedProduct = await ProductManager.updateProductById(parseInt(req.params.pid), req.body);
-    if (updatedProduct) {
-        res.json({ product: updatedProduct, message: "producto actualizado" });
-    } else {
-        res.status(404).send("Producto no encontrado");
-    }
-});
-
-app.delete("/api/products/:pid", async (req, res) => {
-    const remainingProducts = await ProductManager.deleteProductById(parseInt(req.params.pid));
-    res.json({ products: remainingProducts, message: "producto eliminado" });
-});
+app.get("/api/products", ProductService.getProducts)
+app.get("/api/products/:pid", ProductService.getProductById)
+app.post("/api/products", ProductService.addProduct)
+app.put("/api/products/:pid", ProductService.updateProductById)
+app.delete("/api/products/:pid", ProductService.deleteProductById)
 
 //! Rutas de carts
 app.post("/api/carts", async (req, res) => {
@@ -58,7 +32,7 @@ app.get("/api/carts/:cid", async (req, res) => {
 app.post("/api/carts/:cid/product/:pid", async (req, res) => {
     const cartId = parseInt(req.params.cid);
     const productId = parseInt(req.params.pid);
-    const product = await ProductManager.getProductById(productId);
+    const product = await ProductService.getProductById(productId);
     if (!product) {
         return res.status(404).send("Producto no encontrado");
     }
@@ -72,17 +46,17 @@ app.post("/api/carts/:cid/product/:pid", async (req, res) => {
 
 //! Rutas de users
 app.get("/api/users", async (req, res) => {
-    const users = await userManager.getAllUsers();
+    const users = await UserManager.getAllUsers();
     res.json(users);
 });
 
 app.post("/api/users", async (req, res) => {
-    const newUser = await userManager.createUser(req.body);
+    const newUser = await UserManager.createUser(req.body);
     res.status(201).json({ user: newUser, message: "usuario creado" });
 });
 
 app.get("/api/users/:uid", async (req, res) => {
-    const user = await userManager.getUserById(parseInt(req.params.uid));
+    const user = await UserManager.getUserById(parseInt(req.params.uid));
     if (user) {
         res.json(user);
     } else {
@@ -91,7 +65,7 @@ app.get("/api/users/:uid", async (req, res) => {
 });
 
 app.put("/api/users/:uid", async (req, res) => {
-    const updatedUser = await userManager.updateUserById(parseInt(req.params.uid), req.body);
+    const updatedUser = await UserManager.updateUserById(parseInt(req.params.uid), req.body);
     if (updatedUser) {
         res.json({ user: updatedUser, message: "usuario actualizado" });
     } else {
@@ -100,7 +74,7 @@ app.put("/api/users/:uid", async (req, res) => {
 });
 
 app.delete("/api/users/:uid", async (req, res) => {
-    const remainingUsers = await userManager.deleteUserById(parseInt(req.params.uid));
+    const remainingUsers = await UserManager.deleteUserById(parseInt(req.params.uid));
     res.json({ users: remainingUsers, message: "usuario eliminado" });
 });
 
