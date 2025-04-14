@@ -1,5 +1,5 @@
 import express from "express";
-import CartManager from "./services/Cart.js";
+import CartService from "./services/Cart.js";
 import ProductService from "./services/Product.js";
 import UserManager from "./services/User.js"
 
@@ -15,19 +15,8 @@ app.put("/api/products/:pid", ProductService.updateProductById)
 app.delete("/api/products/:pid", ProductService.deleteProductById)
 
 //! Rutas de carts
-app.post("/api/carts", async (req, res) => {
-    const newCart = await CartManager.createCart();
-    res.status(201).json({ cart: newCart, message: "carrito creado" });
-});
-
-app.get("/api/carts/:cid", async (req, res) => {
-    const cart = await CartManager.getCartById(parseInt(req.params.cid));
-    if (cart) {
-        res.json(cart);
-    } else {
-        res.status(404).send("Carrito no encontrado");
-    }
-});
+app.post("/api/carts", CartService.addCart)
+app.get("/api/carts/:cid", CartService.addCart)
 
 app.post("/api/carts/:cid/product/:pid", async (req, res) => {
     const cartId = parseInt(req.params.cid);

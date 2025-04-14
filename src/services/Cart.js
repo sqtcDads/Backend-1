@@ -1,27 +1,16 @@
 import fs from "fs";
+import CartRepository from '../repositories/Cart.js'
 
-class CartManager {
+class CartService {
     constructor() {
-        this.path = "./src/carts.json";
+        this.path = "./src/db/carts.json";
     }
 
 
-    generateNewId = (carts) => {
-        if (carts.length > 0) {
-            return carts[carts.length - 1].id + 1;
-        } else {
-            return 1;
-        }
-    };
 
-    addCart = async () => {
-        const cartsJson = await fs.promises.readFile(this.path, "utf-8");
-        const carts = JSON.parse(cartsJson);
-        const id = this.generateNewId(carts);
-
-        carts.push({ id, products: [] });
-        await fs.promises.writeFile(this.path, JSON.stringify(carts, null, 2), "utf-8");
-        return carts;
+    addCart = async (req, res) => {
+        const cart = await CartRepository.addCart()
+        res.status(201).json({ cart, message: "carrito agregado" });
     };
 
     createCart = async () => {
@@ -30,9 +19,13 @@ class CartManager {
     }
 
     getCartById = async (cartId) => {
-        const carts = await this.getCarts();
-        const cart = carts.find((c) => c.id === cartId);
-        return cart;
+        const cart = await CartService.getCartById(parseInt(req.params.cid));
+
+        if (cart) {
+            res.json(cart);
+        } else {
+            res.status(404).send("Carrito no encontrado");
+        }
     };
 
     getProductsInCartById = async (cid) => {
@@ -45,4 +38,4 @@ class CartManager {
 
 }
 
-export default new CartManager();
+export default new CartService();
