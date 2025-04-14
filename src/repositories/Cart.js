@@ -15,8 +15,13 @@ class CartRepository {
         }
     };
 
-    addCart = async () => {
+    getCarts = async () => {
+        const cartsJson = await fs.promises.readFile(this.path, "utf-8");
+        const carts = JSON.parse(cartsJson);
+        return carts
+    };
 
+    addCart = async () => {
         const cartsJson = await fs.promises.readFile(this.path, "utf-8");
         const carts = JSON.parse(cartsJson);
         const id = this.generateNewId(carts);
@@ -29,6 +34,15 @@ class CartRepository {
         );
         return newCart
     };
+
+    getCartById = async (cartId) => {
+        const carts = await this.getCarts()
+        const cart = carts.find((c) => c.id === cartId)
+        return cart
+    };
+
+
+
 }
 
 export default new CartRepository();

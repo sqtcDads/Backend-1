@@ -6,29 +6,21 @@ class CartService {
         this.path = "./src/db/carts.json";
     }
 
-
-
     addCart = async (req, res) => {
         const cart = await CartRepository.addCart()
         res.status(201).json({ cart, message: "carrito agregado" });
     };
 
-    createCart = async () => {
-        const carts = await this.addCart()
-        return carts[carts.length - 1];
-    }
-
-    getCartById = async (cartId) => {
-        const cart = await CartService.getCartById(parseInt(req.params.cid));
-
-        if (cart) {
-            res.json(cart);
-        } else {
-            res.status(404).send("Carrito no encontrado");
+    getCartById = async (req, res) => {
+        const cartId = parseInt(req.params.cid)
+        const cart = await CartRepository.getCartById(cartId);
+        if (!cart) {
+            return res.status(404).send("Carrito no encontrado");
         }
+        res.status(201).json({ cart, message: "Carrito encontrado" })
     };
 
-    getProductsInCartById = async (cid) => {
+    getProductsInCartById = async (req, res) => {
         const cartsJson = await fs.promises.readFile(this.path, 'utf-8');
         const carts = JSON.parse(cartsJson);
 
@@ -36,6 +28,13 @@ class CartService {
         return cart.products;
     }
 
+    addProductsToCart = async (req, res) => {
+
+    }
+
+    deleteCartById = async (req, res) => {
+
+    }
 }
 
 export default new CartService();
