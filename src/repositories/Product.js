@@ -1,24 +1,20 @@
-import fs from "fs";
+import fs from 'fs'
 
-class ProductManager {
+class ProductRepository {
     constructor() {
-        this.path = "./src/products.json";
-
-        if (!fs.existsSync(this.path)) {
-            fs.writeFileSync(this.path, JSON.stringify([], null, 2), "utf-8");
-        }
+        this.path = "./src/db/products.json";
     }
 
     getProducts = async () => {
         const productsJson = await fs.promises.readFile(this.path, "utf-8");
         const products = JSON.parse(productsJson);
-        return products;
+        return products
     };
 
     getProductById = async (productId) => {
         const products = await this.getProducts();
         const product = products.find((p) => p.id === productId);
-        return product;
+        return product
     };
 
     addProduct = async (newProduct) => {
@@ -42,26 +38,30 @@ class ProductManager {
             JSON.stringify(products, null, 2),
             "utf-8"
         );
-        return productToAdd;
+        return productToAdd
     };
 
     updateProductById = async (productId, updatedFields) => {
         const products = await this.getProducts();
         const productIndex = products.findIndex((p) => p.id === productId);
-        if (productIndex !== -1) {
-            if (updatedFields.id) {
-                delete updatedFields.id;
-            }
-            products[productIndex] = { ...products[productIndex], ...updatedFields };
-            await fs.promises.writeFile(
-                this.path,
-                JSON.stringify(products, null, 2),
-                "utf-8"
-            );
-            return products[productIndex];
+        if (productIndex == -1)
+            return
+
+        if (updatedFields.id) {
+            delete updatedFields.id;
         }
-        return null;
-    };
+        products[productIndex] = {
+            ...products[productIndex],
+            ...updatedFields
+        };
+        await fs.promises.writeFile(
+            this.path,
+            JSON.stringify(products, null, 2),
+            "utf-8"
+        );
+        return products[productIndex]
+    }
+
 
     deleteProductById = async (productId) => {
         const products = await this.getProducts();
@@ -71,8 +71,8 @@ class ProductManager {
             JSON.stringify(newProducts, null, 2),
             "utf-8"
         );
-        return newProducts;
+        return true
     };
-}
 
-export default new ProductManager();
+}
+export default new ProductRepository();
