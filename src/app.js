@@ -16,22 +16,10 @@ app.delete("/api/products/:pid", ProductService.deleteProductById)
 
 //! Rutas de carts
 app.post("/api/carts", CartService.addCart)
-app.get("/api/carts/:cid", CartService.addCart)
+app.get("/api/carts/:cid", CartService.getCartById)
+app.post("/api/carts/:cid/product/:pid", CartService.addProductsToCart)
+app.delete("/api/carts/:cid", CartService.deleteCartById)
 
-app.post("/api/carts/:cid/product/:pid", async (req, res) => {
-    const cartId = parseInt(req.params.cid);
-    const productId = parseInt(req.params.pid);
-    const product = await ProductService.getProductById(productId);
-    if (!product) {
-        return res.status(404).send("Producto no encontrado");
-    }
-    const updatedCart = await CartManager.addProductToCart(cartId, productId);
-    if (updatedCart) {
-        res.json({ cart: updatedCart, message: "producto añadido al carrito" });
-    } else {
-        res.status(404).send("Carrito no encontrado");
-    }
-});
 
 //! Rutas de users
 app.get("/api/users", async (req, res) => {

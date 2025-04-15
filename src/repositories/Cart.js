@@ -41,6 +41,35 @@ class CartRepository {
         return cart
     };
 
+    addProductToCart = async (productId, cartId) => {
+        const carts = await this.getCarts()
+        const cart = carts.find((c) => c.id === cartId)
+        if (!cart) return
+        const product = cart.products.find((p) => p.id === productId)
+        if (!product) {
+            cart.products.push({ id: productId, cant: 1 })
+        } else {
+            product.cant++
+        }
+        await fs.promises.writeFile(
+            this.path,
+            JSON.stringify(carts, null, 2),
+            "utf-8"
+        );
+
+        return cart
+    }
+
+    deleteCartById = async (cartId) => {
+        const carts = await this.getCarts();
+        const newCarts = carts.filter((c) => c.id !== cartId);
+        await fs.promises.writeFile(
+            this.path,
+            JSON.stringify(newCarts, null, 2),
+            "utf-8"
+        );
+        return true
+    };
 
 
 }
