@@ -1,32 +1,45 @@
-import fs from 'fs';
+import UserRepository from '../repositories/User.js'
 
+class UserService {
 
-class UserManager {
-    constructor() {
-        this.path = './src/users.json'
+    getAllUsers = async (req, res) => {
+        const users = await UserRepository.getAllUsers()
+        res.json(users)
     }
-
-    getAllUsers = async () => {
-        const usersJson = await fs.promises.readFile(this.path, 'utf-8')
-        const users = JSON.parse(usersJson)
-        return users;
+    getUserById = async (req, res) => {
+        const userId = parseInt(req.params.uid);
+        const user = await UserRepository.getUserById(userId);
+        if (user) {
+            res.json(user);
+        } else {
+            res.status(404).send("usuario no encontrado");
+        }
     }
-
-    getUserById = async (userId) => {
-        const users = await this.getAllUsers()
-        const user = users.find((userData) => userData.id === userId)
-        return user;
+    createUser = async (req, res) => {
+        const newUser = req.body
+        const addUser = await UserRepository.createUser(newUser);
+        res.status(201).json({ user: addUser, message: "usuario creado" });
     }
-    createrUser = async (newUser) => {
-        const users = await this.getAllUsers()
-        const newId = users.lenght > 0 ? users[users.lenght - 1].id + 1 : 1
-        const addUser = { id: newId, ...newUser }
-        users.push(addUser)
-        await fs.promises.writeFile(this.path, JSON.stringify(users, null, 2), 'utf-8')
-        return addUser
-    }
+    deleteUserById = async (req, res) => {
+        const userId = parseInt(req.params.uid)
+        const result = await UserRepository.deleteUserById(userId)
+        if (!result)
+            return res.status(501).send("No se pudo eliminar");
+        res.json({ message: "usuario eliminado" });
+    };
+    updateUserById = async (req, res) => {
+        const userId = parseInt(req.params.uid)
+        const updatedFields = req.body
+        const updatedUser = await UserRepository.updateUserById(userId, updatedFields)
+        if (!updatedUser)
+            return res.status(404).send("usuario no encontrado");
+        res.json({
+            user: updatedUser,
+            message: "usuario actualizado",
+        });
+    };
 
 
 }
 
-export default new UserManager();
+export default new UserService();
