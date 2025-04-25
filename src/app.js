@@ -17,12 +17,6 @@ const PORT = 8080
 app.use(bodyParser.urlencoded())
 app.use(express.static('public'))
 
-const formDataToJson = (req, res, next) => {
-    console.log(req.body)
-    // next()
-}
-
-
 //! handlebars
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
