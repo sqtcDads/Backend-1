@@ -1,4 +1,4 @@
-import fs from 'fs'
+import ProductModel from "../models/Product.js";
 
 class ProductRepository {
     constructor() {
@@ -6,23 +6,17 @@ class ProductRepository {
     }
 
     getProducts = async () => {
-        const productsJson = await fs.promises.readFile(this.path, "utf-8");
-        const products = JSON.parse(productsJson);
+        const products = await ProductModel.find({});
         return products
     };
 
     getProductById = async (productId) => {
-        const products = await this.getProducts();
-        const product = products.find((p) => p.id === productId);
+        const product = await ProductModel.findById(productId).exec();
         return product
     };
 
     addProduct = async (newProduct) => {
-        const products = await this.getProducts();
-        const newId =
-            products.length > 0 ? products[products.length - 1].id + 1 : 1;
         const productToAdd = {
-            id: newId,
             title: newProduct.title,
             description: newProduct.description,
             code: newProduct.code,
@@ -32,46 +26,21 @@ class ProductRepository {
             category: newProduct.category,
             thumbnails: newProduct.thumbnails || [],
         };
-        products.push(productToAdd);
-        await fs.promises.writeFile(
-            this.path,
-            JSON.stringify(products, null, 2),
-            "utf-8"
-        );
-        return productToAdd
+        const product = await ProductModel.create(productToAdd);
+        return product
     };
 
     updateProductById = async (productId, updatedFields) => {
-        const products = await this.getProducts();
-        const productIndex = products.findIndex((p) => p.id === productId);
-        if (productIndex == -1)
+        const res = await ProductModel.updateOne({ _id: productId }, updatedFields);
+        if (!res)
             return
-
-        if (updatedFields.id) {
-            delete updatedFields.id;
-        }
-        products[productIndex] = {
-            ...products[productIndex],
-            ...updatedFields
-        };
-        await fs.promises.writeFile(
-            this.path,
-            JSON.stringify(products, null, 2),
-            "utf-8"
-        );
-        return products[productIndex]
+        return res
     }
 
 
     deleteProductById = async (productId) => {
-        const products = await this.getProducts();
-        const newProducts = products.filter((p) => p.id !== productId);
-        await fs.promises.writeFile(
-            this.path,
-            JSON.stringify(newProducts, null, 2),
-            "utf-8"
-        );
-        return true
+        const res = await ProductModel.deleteMany({ _id: productId })
+        return res
     };
 
 }

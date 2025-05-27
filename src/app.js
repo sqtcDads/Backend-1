@@ -8,8 +8,12 @@ import ProductRepository from './repositories/Product.js'
 import bodyParser from 'body-parser'
 import { engine } from 'express-handlebars';
 import { Server } from 'socket.io';
+import connectMongoDB from "./config/db.js"
+
 
 const app = express();
+await connectMongoDB()
+
 const server = http.createServer(app)
 const io = new Server(server)
 const PORT = 8080
@@ -24,7 +28,6 @@ app.set('views', './src/views');
 
 //! Render
 app.use('/', viewsRouter)
-
 app.use(express.json());
 
 //! Rutas de products

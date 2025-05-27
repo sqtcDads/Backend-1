@@ -8,7 +8,7 @@ class ProductService {
     };
 
     getProductById = async (req, res) => {
-        const productId = parseInt(req.params.pid);
+        const productId = req.params.pid
         const product = await ProductRepository.getProductById(productId);
         if (product) {
             res.json(product);
@@ -24,7 +24,7 @@ class ProductService {
     };
 
     updateProductById = async (req, res) => {
-        const productId = parseInt(req.params.pid);
+        const productId = req.params.pid
         const updatedFields = req.body;
         const updatedProduct = await ProductRepository.updateProductById(productId, updatedFields)
         if (!updatedProduct)
@@ -36,10 +36,11 @@ class ProductService {
     };
 
     deleteProductById = async (req, res) => {
-        const productId = parseInt(req.params.pid)
+        const productId = req.params.pid
         const result = await ProductRepository.deleteProductById(productId)
-        if (!result)
-            return res.status(501).send("No se pudo eliminar");
+        console.log(result)
+        if (result.deletedCount == 0)
+            return res.status(501).send("no existe product con ese id");
         res.json({ message: "producto eliminado" });
     };
 }
