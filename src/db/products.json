@@ -79,5 +79,16 @@
     "stock": "222",
     "category": "rrr",
     "thumbnails": []
+  },
+  {
+    "id": 7,
+    "title": "audifonos",
+    "description": "xiaomi",
+    "code": "123",
+    "price": "111",
+    "status": true,
+    "stock": "11",
+    "category": "audifonos",
+    "thumbnails": []
   }
 ]

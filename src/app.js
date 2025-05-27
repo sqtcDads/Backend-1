@@ -1,10 +1,10 @@
 import express from "express";
 import http from 'http'
-import CartService from "./services/Cart.js";
-import UserService from "./services/User.js"
 import productRouter from "./routes/Product.js"
-import ProductRepository from './repositories/Product.js'
 import viewsRouter from "./routes/views.router.js";
+import cartRouter from "./routes/Cart.js";
+import userRouter from "./routes/User.js";
+import ProductRepository from './repositories/Product.js'
 import bodyParser from 'body-parser'
 import { engine } from 'express-handlebars';
 import { Server } from 'socket.io';
@@ -31,21 +31,15 @@ app.use(express.json());
 app.use(productRouter)
 
 //! Rutas de carts
-app.post("/api/carts", CartService.addCart)
-app.get("/api/carts/:cid", CartService.getCartById)
-app.post("/api/carts/:cid/product/:pid", CartService.addProductsToCart)
-app.delete("/api/carts/:cid", CartService.deleteCartById)
+app.use(cartRouter)
 
 //! Rutas de users
-app.get("/api/users", UserService.getAllUsers)
-app.post("/api/users", UserService.createUser)
-app.get("/api/users/:uid", UserService.getUserById)
-app.delete("/api/users/:uid", UserService.deleteUserById)
-app.put("/api/users/:uid", UserService.updateUserById)
+app.use(userRouter)
 
 server.listen(PORT, () => {
     console.log("Server is running on port 8080");
 });
+
 io.on("connection", (socket) => {
     socket.on("newProduct", async (productData) => {
         try {
