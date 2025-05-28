@@ -5,8 +5,13 @@ class ProductRepository {
         this.path = "./src/db/products.json";
     }
 
-    getProducts = async () => {
-        const products = await ProductModel.find({});
+    getDocumentCount = async () => {
+        const docQuantity = await ProductModel.estimatedDocumentCount()
+        return docQuantity
+    }
+
+    getProducts = async (limit, query, sort, page) => {
+        const products = await ProductModel.find({ title: { $regex: "^" + query, $options: 'i' } }, null, { limit, sort: { price: sort }, skip: (page - 1) * limit });
         return products
     };
 

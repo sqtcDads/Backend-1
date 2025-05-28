@@ -3,8 +3,30 @@ import ProductRepository from '../repositories/Product.js'
 class ProductService {
 
     getProducts = async (req, res) => {
-        const products = await ProductRepository.getProducts();
-        res.json(products)
+        const { limit = 10, query = "", sort = "asc", page = 1 } = req.query;
+        const products = await ProductRepository.getProducts(limit, query, sort, page);
+        const docQuantity = await ProductRepository.getDocumentCount()
+        const totalPages = Math.ceil(docQuantity / limit)
+        const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+        const prevUrl = new URL(fullUrl)
+        const nextUrl = new URL(fullUrl)
+        prevUrl.searchParams.set("page", page - 1)
+        nextUrl.searchParams.set("page", +page + 1)
+        const hasNextPage = totalPages > page ? true : false
+        const hasPrevPage = page == 1 ? false : true
+
+        res.json({
+            "status": "succes",
+            "payload": products,
+            "totalPages": totalPages,
+            "prevPage": page == 1 ? null : page - 1,
+            "nextPage": totalPages > page ? +page + 1 : null,
+            "page": +page,
+            "hasPrevPage": hasPrevPage,
+            "hasNextPage": hasNextPage,
+            "prevLink": hasPrevPage ? prevUrl : null,
+            "nextLink": hasNextPage ? nextUrl : null
+        })
     };
 
     getProductById = async (req, res) => {
