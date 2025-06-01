@@ -1,5 +1,5 @@
 import fs from 'fs'
-
+import CartModel from '../models/Cart.js'
 
 class CartRepository {
     constructor() {
@@ -22,17 +22,9 @@ class CartRepository {
     };
 
     addCart = async () => {
-        const cartsJson = await fs.promises.readFile(this.path, "utf-8");
-        const carts = JSON.parse(cartsJson);
-        const id = this.generateNewId(carts);
-        const newCart = { id, products: [] }
-        carts.push(newCart);
-        await fs.promises.writeFile(
-            this.path,
-            JSON.stringify(carts, null, 2),
-            "utf-8"
-        );
-        return newCart
+        const newCart = { products: [] }
+        const cart = await CartModel.create(newCart)
+        return cart
     };
 
     getCartById = async (cartId) => {
@@ -41,23 +33,34 @@ class CartRepository {
         return cart
     };
 
-    addProductToCart = async (productId, cartId) => {
-        const carts = await this.getCarts()
-        const cart = carts.find((c) => c.id === cartId)
-        if (!cart) return
-        const product = cart.products.find((p) => p.id === productId)
+    addProductToCart = async (productId, cartId, productQuantity) => {
+        const cart = await CartModel.findById(cartId)
+        if (!cart) return null
+        const product = cart.products.find((p) => p.productId.toString() === productId)
         if (!product) {
-            cart.products.push({ id: productId, cant: 1 })
+            cart.products.push({
+                productId,
+                quantity: 1
+            })
         } else {
-            product.cant++
+            product.quantity = productQuantity
         }
-        await fs.promises.writeFile(
-            this.path,
-            JSON.stringify(carts, null, 2),
-            "utf-8"
-        );
+        const saveCart = await cart.save()
+        return saveCart
+    }
 
-        return cart
+    deleteProductsInCart = async (cartId) => {
+        const cart = await CartModel.findById(cartId)
+        cart.products = []
+        const saveCart = await cart.save()
+        return saveCart
+    }
+
+    updateProductsInCart = async (products, cartId) => {
+        const cart = await CartModel.findById(cartId)
+        cart.products = products
+        const saveCart = await cart.save()
+        return saveCart
     }
 
     deleteCartById = async (cartId) => {
@@ -70,6 +73,7 @@ class CartRepository {
         );
         return true
     };
+
 
 
 }

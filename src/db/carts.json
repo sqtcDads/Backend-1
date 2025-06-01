@@ -1,10 +1,20 @@
 [
   {
     "id": 1,
-    "products": []
+    "products": [
+      {
+        "id": 682505,
+        "cant": 1
+      }
+    ]
   },
   {
     "id": 2,
-    "products": []
+    "products": [
+      {
+        "id": 682505,
+        "cant": 1
+      }
+    ]
   }
 ]
